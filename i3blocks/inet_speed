@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 SPEEDTEST_RESULTS=`speedtest-cli`
 
-UP="$(echo $SPEEDTEST_RESULTS | grep -Po "(?<=Download: )\\d*")"
-DOWN="$(echo $SPEEDTEST_RESULTS | grep -Po "(?<=Upload: )\\d*")"
+DOWN="$(echo $SPEEDTEST_RESULTS | grep -Po "(?<=Download: )\\d*")"
+UP="$(echo $SPEEDTEST_RESULTS | grep -Po "(?<=Upload: )\\d*")"
 
-echo "$UP/$DOWN"
+echo "$DOWN/$UP"
