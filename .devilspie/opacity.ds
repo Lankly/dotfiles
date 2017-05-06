@@ -1,0 +1,18 @@
+( if
+  ( or
+    ( contains ( window_class ) "Xterm" )
+    ( contains ( window_class ) "Termite" )
+    ( contains ( window_class ) "discord" )
+    ( contains ( window_class ) "vlc" )
+    ( contains ( window_class ) "Vlc" )
+    ( contains ( window_name ) "vlc" )
+    ( contains ( window_name ) "Vlc" )
+    ( contains ( window_class ) "rofi" )
+    ( contains ( window_class ) "Rofi" )
+    ( contains ( window_name ) "rofi" )
+    ( contains ( window_name ) "Rofi" )
+  )
+  ( begin
+    ( spawn_async (str "transset-df -i " (window_xid) " 0.9" ))
+  )
+)

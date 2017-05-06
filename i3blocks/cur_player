@@ -1,0 +1,29 @@
+#!/usr/bin/bash
+TIME="$(date +%s)"
+TIME="${TIME: -1}"
+BODY="$(echo '0189' | grep $TIME)"
+
+# Coloring
+START_TAG="<span foreground=\"#00ff00\">"
+END_TAG="</span>"
+MOUSE_COORD="$(xdotool getmouselocation)"
+{
+    x=`echo $MOUSE_COORD | grep -Po "(?<=x:)[0-9]*"`
+    y=`echo $MOUSE_COORD | grep -Po "(?<=y:)[0-9]*"`
+    #echo "$x $y"
+    if [ $y -lt 33 ];then
+	START_TAG="<span foreground=\"#2f343f\" background=\"#00ff00\">"
+    fi
+}
+
+# Command to display
+{
+if [ -z $BODY ]; then
+    BODY="$(lsof -wc vlc | awk '$4~"[0-9]r" && $5=="REG"' | grep -o '[^/]*$' | sed 's/\(.*\)\.[^.]*/♪ \1 ♪/')"
+else
+    BODY="$(xprop -id $(xprop -root _NET_ACTIVE_WINDOW | cut -d ' ' -f 5) WM_NAME | cut -d '"' -f 2)"
+fi
+}
+
+# Return
+echo "$START_TAG $BODY $END_TAG"

@@ -1,0 +1,10 @@
+( if
+( or
+( contains ( window_class ) "vlc" )
+( contains ( window_class ) "pavucontrol" )
+)
+( begin
+( set_workspace 10 )
+( maximize )
+)
+)
