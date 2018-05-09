@@ -22,19 +22,19 @@ MOUSE_COORD="$(xdotool getmouselocation)"
 if [ -z $BODY ]; then
     # Get metadata from current song
     TAGS=`taffy "$CURSONG"`
-    ARTIST=`echo $TAGS | sed 's/.*artist: \(.*\) comment:.*/\1/'`
-    TITLE=`echo $TAGS | sed 's/.*title: \(.*\) track:.*/\1/'`
+    ARTIST=`echo "$TAGS" | grep -Pi "^artist" | sed 's/^artist:\s*//'`
+    TITLE=`echo "$TAGS" | grep -Pi "^title" | sed 's/^title:\s*//'`
     TIME=`timedatectl | grep -i "local time" | sed 's/.*time: ... //; s/:.. ...$//; s/ /./;'`
     DURATION=`ffmpeg -i "$CURSONG" 2>&1 | grep "Duration" | cut -d ' ' -f 4 | sed 's/^..:\(..\):\(..\).*/\1m\2s/'`
     BODY="♪ $TITLE — $ARTIST ♪"
 
     # Get metadata from last song
-    LAST_SONG=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^location" | sed 's/location:\s*//'`
-    LAST_ARTIST=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^artist" | sed 's/artist:\s*//'`
-    LAST_TITLE=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^title" | sed 's/title:\s*//'`
-    LAST_TIME=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^time" | sed 's/time:\s*//'`
-    LAST_ALBUM=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^album" | sed 's/album:\s*//'`
-    LAST_DURATION=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^duration" | sed 's/duration:\s*//'`
+    LAST_SONG=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^location" | sed 's/^location:\s*//'`
+    LAST_ARTIST=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^artist" | sed 's/^artist:\s*//'`
+    LAST_TITLE=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^title" | sed 's/^title:\s*//'`
+    LAST_TIME=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^time" | sed 's/^time:\s*//'`
+    LAST_ALBUM=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^album" | sed 's/^album:\s*//'`
+    LAST_DURATION=`cat /home/lan/.config/cur_player/last_song.txt | grep -Pi "^duration" | sed 's/^duration:\s*//'`
 
     # Submit to last.fm?
     YEAR=`echo $TIME | sed 's/\(....\).*/\1/'`
@@ -48,14 +48,16 @@ if [ -z $BODY ]; then
     LAST_DAY=`echo $LAST_TIME | sed 's/.*\(..\)\..*/\1/'`
     LAST_HOUR=`echo $LAST_TIME | sed 's/.*\(..\):.*/\1/'`
     LAST_MINUTE=`echo $LAST_TIME | sed 's/.*\(..\)$/\1/'`
-    if [[ "$TITLE" != "$LAST_TITLE" \
+    if [[ $TITLE != $LAST_TITLE \
 	&& ($YEAR > $LAST_YEAR \
 	|| $MONTH > $LAST_MONTH \
 	|| $DAY > $LAST_DAY \
 	|| $HOUR > $LAST_DAY \
 	|| $MINUTE > $LAST_MINUTE) ]]; then
         printf "location: $TAGS\nduration: $DURATION\ntime: $TIME\n" > /home/lan/.config/cur_player/last_song.txt
-        scrobbler scrobble Lankly $LAST_ARTIST "$LAST_TITLE" $LAST_TIME -a "$LAST_ALBUM" -d $LAST_DURATION
+        SCROB_CMD="scrobbler scrobble Lankly \"$LAST_ARTIST\" \"$LAST_TITLE\" $LAST_TIME -a \"$LAST_ALBUM\" -d $LAST_DURATION"
+	echo $SCROB_CMD > /home/lan/.config/cur_player/last_scrobble.txt
+	eval $SCROB_CMD > /home/lan/.config/cur_player/last_scrobble_status.txt
     fi
 else
     BODY="$(xprop -id $(xprop -root _NET_ACTIVE_WINDOW | cut -d ' ' -f 5) WM_NAME | cut -d '"' -f 2)"
