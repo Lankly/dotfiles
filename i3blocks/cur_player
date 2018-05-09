@@ -20,6 +20,11 @@ MOUSE_COORD="$(xdotool getmouselocation)"
 # Command to display
 {
 if [ -z $BODY ]; then
+    # Current window's name
+    BODY="$(xprop -id $(xprop -root _NET_ACTIVE_WINDOW | cut -d ' ' -f 5) WM_NAME | cut -d '"' -f 2)"
+else
+    # Current song
+
     # Get metadata from current song
     TAGS=`taffy "$CURSONG"`
     ARTIST=`echo "$TAGS" | grep -Pi "^artist" | sed 's/^artist:\s*//'`
@@ -66,8 +71,6 @@ if [ -z $BODY ]; then
 	    eval $SCROB_CMD > /home/lan/.config/cur_player/last_scrobble_status.txt
         fi
     fi
-else
-    BODY="$(xprop -id $(xprop -root _NET_ACTIVE_WINDOW | cut -d ' ' -f 5) WM_NAME | cut -d '"' -f 2)"
 fi
 }
 
