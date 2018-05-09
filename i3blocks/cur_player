@@ -42,22 +42,29 @@ if [ -z $BODY ]; then
     DAY=`echo $TIME | sed 's/.*\(..\)\..*/\1/'`
     HOUR=`echo $TIME | sed 's/.*\(..\):.*/\1/'`
     MINUTE=`echo $TIME | sed 's/.*\(..\)$/\1/'`
+    MINUTE=$((10#$MINUTE))
 
     LAST_YEAR=`echo $LAST_TIME | sed 's/\(....\).*/\1/'`
     LAST_MONTH=`echo $LAST_TIME | sed 's/.*-\(..\)-.*/\1/'`
     LAST_DAY=`echo $LAST_TIME | sed 's/.*\(..\)\..*/\1/'`
     LAST_HOUR=`echo $LAST_TIME | sed 's/.*\(..\):.*/\1/'`
     LAST_MINUTE=`echo $LAST_TIME | sed 's/.*\(..\)$/\1/'`
-    if [[ $TITLE != $LAST_TITLE \
-	&& ($YEAR > $LAST_YEAR \
-	|| $MONTH > $LAST_MONTH \
-	|| $DAY > $LAST_DAY \
-	|| $HOUR > $LAST_DAY \
-	|| $MINUTE > $LAST_MINUTE) ]]; then
-        printf "location: $TAGS\nduration: $DURATION\ntime: $TIME\n" > /home/lan/.config/cur_player/last_song.txt
-        SCROB_CMD="scrobbler scrobble Lankly \"$LAST_ARTIST\" \"$LAST_TITLE\" $LAST_TIME -a \"$LAST_ALBUM\" -d $LAST_DURATION"
-	echo $SCROB_CMD > /home/lan/.config/cur_player/last_scrobble.txt
-	eval $SCROB_CMD > /home/lan/.config/cur_player/last_scrobble_status.txt
+    LAST_MINUTE=$((10#$LAST_MINUTE))
+    LAST_MINUTE_MORE=$((LAST_MINUTE+1))
+    if [[ $TITLE != $LAST_TITLE ]]; then
+	# Always keep last_song up to date
+	printf "location: $TAGS\nduration: $DURATION\ntime: $TIME\n" > /home/lan/.config/cur_player/last_song.txt
+
+	# Enough time needs to have elapsed to scrobble
+	if [ $YEAR -gt $LAST_YEAR ] \
+	    || [ $MONTH -gt $LAST_MONTH ] \
+	    || [ $DAY -gt $LAST_DAY ] \
+	    || [ $HOUR -gt $LAST_DAY ] \
+	    || [ $MINUTE -gt $LAST_MINUTE_MORE ]; then
+            SCROB_CMD="scrobbler scrobble Lankly \"`echo $LAST_ARTIST | sed 's/"/\\\\"/g;'`\" \"`echo $LAST_TITLE | sed 's/"/\\\\"/g;'`\" $LAST_TIME -a \"`echo $LAST_ALBUM | sed 's/"//\\\\"/'`\" -d $LAST_DURATION"
+	    echo $SCROB_CMD > /home/lan/.config/cur_player/last_scrobble.txt
+	    eval $SCROB_CMD > /home/lan/.config/cur_player/last_scrobble_status.txt
+        fi
     fi
 else
     BODY="$(xprop -id $(xprop -root _NET_ACTIVE_WINDOW | cut -d ' ' -f 5) WM_NAME | cut -d '"' -f 2)"
