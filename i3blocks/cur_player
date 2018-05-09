@@ -59,7 +59,7 @@ if [ -z $BODY ]; then
 	if [ $YEAR -gt $LAST_YEAR ] \
 	    || [ $MONTH -gt $LAST_MONTH ] \
 	    || [ $DAY -gt $LAST_DAY ] \
-	    || [ $HOUR -gt $LAST_DAY ] \
+	    || [ $HOUR -gt $LAST_HOUR ] \
 	    || [ $MINUTE -gt $LAST_MINUTE_MORE ]; then
             SCROB_CMD="scrobbler scrobble Lankly \"`echo $LAST_ARTIST | sed 's/"/\\\\"/g;'`\" \"`echo $LAST_TITLE | sed 's/"/\\\\"/g;'`\" $LAST_TIME -a \"`echo $LAST_ALBUM | sed 's/"//\\\\"/'`\" -d $LAST_DURATION"
 	    echo $SCROB_CMD > /home/lan/.config/cur_player/last_scrobble.txt
