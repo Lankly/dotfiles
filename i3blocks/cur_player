@@ -16,7 +16,6 @@ MOUSE_COORD="$(xdotool getmouselocation)"
     fi
 }
 
-    CURSONG="$(lsof -wc vlc | awk '$4~"[0-9]r" && $5=="REG"' | grep -Pi "(flac|m4a|mp3|mp4|wav|wma)$" | sed 's/^.*\(\/home\)/\1/;')"
 # Command to display
 {
 if [ -z $BODY ]; then
@@ -24,6 +23,8 @@ if [ -z $BODY ]; then
     BODY="$(xprop -id $(xprop -root _NET_ACTIVE_WINDOW | cut -d ' ' -f 5) WM_NAME | cut -d '"' -f 2)"
 else
     # Current song
+
+    CURSONG="$(lsof -wc vlc | awk '$4~"[0-9]r" && $5=="REG"' | grep -Pi "(flac|m4a|mp3|mp4|wav|wma)$" | sed 's/^.*\(\/home\)/\1/;')"
 
     # Get metadata from current song
     TAGS=`taffy "$CURSONG"`
